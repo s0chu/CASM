@@ -140,22 +140,73 @@ recalculate: ; ptr -> void
     pop rbp 
     ret
 
+insert: 
+
 left_rotate: ; ptr -> ptr
     push rbp 
     mov rbp , rsp 
 
+    push rdi 
+    mov rdi , [rdi + right]
+    push rdi 
+    mov rdi , [rdi + left]
+    push rdi 
 
+    %define x -8
+    %define y -16
+    %define z -24
 
+    mov rdi , [rbp + x]
+    mov rsi , [rbp + z]
+    mov [rdi + right] , rsi
 
+    mov rdi , [rbp + y]
+    mov rsi , [rbp + x]
+    mov [rdi + left] , rsi
+
+    mov rdi , [rbp + x]
+    call recalculate
+
+    mov rdi , [rbp + y]
+    call recalculate
+
+    mov rax , [rbp + y]
 
     mov rsp , rbp
     pop rbp
     ret
 
-
-
 right_rotate: ; ptr -> ptr
+    push rbp 
+    mov rbp , rsp 
 
+    push rdi
+    mov rdi , [rdi + left]
+    push rdi 
+    mov rdi , [rdi + right]
+    push rdi 
+
+    %define x -8
+    %define y -16
+    %define z -24
+
+    mov rdi , [rbp + y]
+    mov rsi , [rbp + x]
+    mov [rdi + right] , rsi 
+
+    mov rdi , [rbp + x]
+    mov rsi , [rbp + z]
+    mov [rdi + left] , rsi 
+
+    mov rdi , [rbp + x]
+    call recalculate
+
+    mov rdi , [rbp + y]
+    call recalculate 
+
+    mov rsp , rbp 
+    pop rbp 
+    ret 
 
 
                 section .data
