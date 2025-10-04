@@ -4,6 +4,8 @@
                     global format_decimal
                     global format_node
                     global format_string 
+                    global format_pointer 
+                    global format_key 
 
                     global strcpy
                     global strlen
@@ -101,9 +103,13 @@ strcmp:
 
                 section .data 
 
+
             format_decimal: db "%d" , 10 , 0
             format_string:  db "%s" , 10 , 0
-            format_node:    db "left:%p right:%p height:%d key: %s value: %d" , 10
+            format_node:    db "left:%p right:%p height:%d key: %s value: %d curr: %p" , 10 , 0
+            format_key:    db "%s" , 10 , 0
+            format_pointer: db "%p" , 10 , 0
+
     ; 1 0 -> 0
     ; 1011 ->     10110
     ; 1011        01010 -> -10
