@@ -254,7 +254,7 @@ get_height_2:
     call get_height
 
     cmp rdi , 0
-    
+
     je .skip
         add rax , 1
     .skip:
