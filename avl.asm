@@ -574,7 +574,7 @@ print_avl:
             ALLOCATED_POWER: db 0
             REMAINING_MEMORY: dd  0
             ARB_PTR: dq 0 
-            _SIZE: equ 48
+            _SIZE: equ 48 
             txt: db "hello" ,  10 , 0
             root: dq 0
             left:   equ  0
