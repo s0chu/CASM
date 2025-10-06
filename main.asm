@@ -21,10 +21,10 @@ _start:
             
             push rdi 
 
-            mov rdi , format_decimal
-            mov rsi , [rbp + 8]
-            xor rax , rax
-            call printf     
+            ; mov rdi , format_decimal
+            ; mov rsi , [rbp + 8]
+            ; xor rax , rax
+            ; call printf     
 
             ; mov rax , 2
             ; mov rdi , path
@@ -49,6 +49,11 @@ _start:
             ; mov rsi , reading 
             ; xor rax , rax
             ; call printf
+
+            call stress_test
+
+                mov rdi , [root]
+                call print_avl
 
             mov rsp , rbp
             pop rbp 

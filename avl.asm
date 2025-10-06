@@ -32,7 +32,7 @@
 %endmacro 
 
 %assign chunk_counter 0
-%assign if_counter 10
+%assign if_counter 1000
 %assign power_counter 1
 
 %macro allocate_chunk 0
@@ -80,7 +80,12 @@ create_new_node:
         allocate_chunk
         allocate_chunk
         allocate_chunk
-
+        allocate_chunk
+        allocate_chunk
+        allocate_chunk
+        allocate_chunk
+        allocate_chunk
+        allocate_chunk
     if_10.fi:
 
     

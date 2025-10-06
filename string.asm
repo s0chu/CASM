@@ -106,7 +106,7 @@ strcmp:
 
             format_decimal: db "%d" , 10 , 0
             format_string:  db "%s" , 10 , 0
-            format_node:    db "left:%p right:%p height:%d key: %s value: %d curr: %p" , 10 , 0
+            format_node:    db "left:%10p right:%10p height:%5d key: %6s value: %5d curr: %10p" , 10 , 0
             format_key:     db "%s" , 10 , 0
             format_pointer: db "%p" , 10 , 0
 
