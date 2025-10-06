@@ -49,7 +49,7 @@ _start:
             ; mov rsi , reading 
             ; xor rax , rax
             ; call printf
-
+asdf
             call stress_test
 
                 mov rdi , [root]
