@@ -84,8 +84,7 @@ create_new_node:
         allocate_chunk
         allocate_chunk
         allocate_chunk
-        allocate_chunk
-        allocate_chunk
+        
     if_10.fi:
 
     

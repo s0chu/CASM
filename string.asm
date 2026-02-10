@@ -10,6 +10,7 @@
                     global strcpy
                     global strlen
                     global strcmp
+                    global strstr 
 
 strlen:
     push rbp
@@ -101,6 +102,41 @@ strcmp:
     pop rbp
     ret
 
+strstr: 
+    push rbp 
+    mov rbp , rsp 
+
+    .for1:
+            mov rbx , 0 
+            mov rax , rdi 
+
+            .for2: 
+                cmp byte [rsi + rbx] , 0 
+                je .return  
+                           
+                cmp byte [rdi + rbx] , 0
+                je .done1
+
+                mov cl , [rsi + rbx]
+                cmp [rdi + rbx] , cl 
+
+                jne .skip
+
+                inc rbx 
+                jmp .for2
+            .done2:
+
+        .skip:
+        inc rdi
+        jmp .for1
+    .done1:
+
+    mov rax , 0 
+    .return:
+
+    mov rsp , rbp 
+    pop rbp 
+    ret
                 section .data 
 
 
