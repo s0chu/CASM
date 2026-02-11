@@ -4,12 +4,15 @@
                 extern strcpy 
                 extern strcmp 
                 extern strlen 
+                extern strchr 
 
                 extern format_decimal
                 extern format_node 
                 extern format_string 
                 extern format_pointer 
                 extern format_key
+
+                extern malloc
 
                 global left 
                 global right
@@ -22,82 +25,16 @@
                 global insert 
                 global root 
                 global print_avl 
-
-%macro create_memory_pool 2 
-                [section .bss]
-    %1: resb _SIZE * %2
-                [section .text]
-    mov dword [REMAINING_MEMORY] , %2
-    mov qword [ARB_PTR] , %1
-%endmacro 
-
-%assign chunk_counter 0
-%assign if_counter 1000
-%assign power_counter 1
-
-%macro allocate_chunk 0
-    %assign chunk_counter chunk_counter + 1
-    %assign if_counter if_counter + 1
-    %assign power_counter power_counter * 2
-
-    if_ %+ %[if_counter]:   cmp byte [ALLOCATED_POWER] , %[chunk_counter]
-                            jne if_ %+ %[if_counter].fi 
-            
-            create_memory_pool memory_pool_chunk %+ %[chunk_counter] , %[power_counter]
-
-    if_ %+ %[if_counter].fi:
-%endmacro
-
+                global check 
+                global update 
+                global get 
 
 create_new_node:
     push rbp 
     mov rbp , rsp 
 
-
-    if_10:  cmp dword [REMAINING_MEMORY] , 0
-            jne if_10.fi
-        
-        add byte [ALLOCATED_POWER] , 1
-
-        
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        allocate_chunk
-        
-    if_10.fi:
-
-    
-    mov rax , [ARB_PTR]
-    push rax 
-    add qword [ARB_PTR] , _SIZE
-    sub dword [REMAINING_MEMORY] , 1
-
-    ; mov rdi , txt 
-    ; xor rax , rax
-    ; call printf 
-
-    mov rax , [rbp - 8]
+    mov rdi , _SIZE 
+    call malloc 
 
     mov rsp , rbp 
     pop rbp 
@@ -115,8 +52,14 @@ init_node: ; ptr , name , value
 
     add rdi , key
     push rdi
+    push rsi 
     mov rsi , rsi
     call strcpy
+
+    ; mov rdi , format_string 
+    ; mov rsi , [rbp - 8]
+    ; xor rax , rax 
+    ; call printf 
 
     mov rsp , rbp
     pop rbp
@@ -126,9 +69,15 @@ new_node:
     push rbp 
     mov rbp , rsp
     
+    push rdi 
+    push rsi 
+
     call create_new_node
 
     push rax 
+
+    mov rdi , [rbp - 8]
+    mov rsi , [rbp - 16]
 
     mov rdx , rsi
     mov rsi , rdi 
@@ -141,7 +90,7 @@ new_node:
     ; xor rax , rax
     ; call printf
 
-    mov rax , [rbp - 8]
+    mov rax , [rbp - 24]
 
     mov rsp , rbp 
     pop rbp 
@@ -559,6 +508,8 @@ print_avl:
     mov [rbp + node] , rdi
 
     mov rdi , [rbp + node]
+
+    mov rdi , [rbp + node]
     mov rdi , [rdi + left]
 
     call print_avl 
@@ -574,13 +525,173 @@ print_avl:
     mov rsp , rbp 
     pop rbp
     ret
+
+check: ; node , key -> bool 
+    push rbp 
+    mov rbp , rsp 
+    sub rsp , 64
+
+    %define curr -8
+    %define search_key -16
+    
+    mov [rbp + curr] , rdi 
+    mov [rbp + search_key] , rsi 
+    
+    if_34:  cmp rdi , 0 
+            jne .fi 
+        mov al , 0
+        jmp check.return 
+    .fi:
+
+    mov rdi , [rbp + curr]
+    add rdi , key 
+    mov rsi , [rbp + search_key]
+    call strcmp 
+
+    if_32:  cmp rax , 0
+            jne if_32.else 
+
+        mov al , 1
+        jmp if_32.fi
+    if_32.else:  
+            if_33:  cmp rax , 1 
+                    jne if_33.else 
+
+                mov rdi , [rbp + curr]
+                add rdi , left 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                call check 
+        
+                jmp if_33.fi            
+            .else: 
+                mov rdi , [rbp + curr]
+                add rdi , right 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                call check 
+
+                jmp if_33.fi
+            .fi: 
+    if_32.fi:
+
+    check.return:
+    mov rsp , rbp 
+    pop rbp 
+    ret 
+
+update: ; ptr key value -> void
+    push rbp 
+    mov rbp , rsp 
+
+    sub rsp , 60
+
+    %define curr -8 
+    %define search_key -16
+    %define updated_value -24
+
+    mov [rbp + curr] , rdi 
+    mov [rbp + search_key] , rsi 
+    mov [rbp + updated_value] , rdx 
+
+    if_35:  mov rdi , [rbp + curr]
+            add rdi , key
+            mov rsi , [rbp + search_key]
+            call strcmp 
+            cmp rax , 0 
+            jne if_35.else 
+                mov rbx , [rbp + updated_value]
+                mov rax , [rbp + curr]
+                add rax , value
+                mov [rax] , rbx
+            jmp if_35.fi
+    if_35.else:
+            if_36:  cmp rax , -1
+                    jne if_36.else 
+
+                mov rdi , [rbp + curr]
+                add rdi , right 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                mov rdx , [rbp + updated_value]
+                call update
+
+                jmp if_36.fi
+            if_36.else:
+                mov rdi , [rbp + curr]
+                add rdi , left 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                mov rdx , [rbp + updated_value]
+                call update
+
+            if_36.fi:
+
+    if_35.fi:
+
+    update.return:
+
+    mov rsp , rbp 
+    pop rbp 
+    ret 
+get: ; key -> long long 
+    push rbp 
+    mov rbp , rsp 
+
+    sub rsp , 60
+
+    %define curr -8 
+    %define search_key -16
+
+    mov [rbp + curr] , rdi 
+    mov [rbp + search_key] , rsi 
+
+    if_37:  mov rdi , [rbp + curr]
+            add rdi , key
+            mov rsi , [rbp + search_key]
+            call strcmp 
+            cmp rax , 0 
+            jne if_37.else 
+                mov rax , [rbp + curr]
+                add rax , value 
+                mov rax , [rax]
+            jmp if_37.fi
+    if_37.else:
+            if_38:  cmp rax , -1
+                    jne if_38.else 
+
+                mov rdi , [rbp + curr]
+                add rdi , right 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                call get
+
+                jmp if_38.fi
+            if_38.else:
+                mov rdi , [rbp + curr]
+                add rdi , left 
+                mov rdi , [rdi]
+                mov rsi , [rbp + search_key]
+                call get
+
+            if_38.fi:
+
+    if_37.fi:
+
+    get.return:
+
+    mov rsp , rbp 
+    pop rbp 
+    ret 
+
+
                 section .data
-            ALLOCATED_POWER: db 0
-            REMAINING_MEMORY: dd  0
             ARB_PTR: dq 0 
             _SIZE: equ 48 
             txt: db "hello" ,  10 , 0
             root: dq 0
+
+            ; avl node
             left:   equ  0
             right:  equ  8
             height: equ 16

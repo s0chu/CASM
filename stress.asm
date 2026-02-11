@@ -3,7 +3,12 @@
                 extern new_node
                 extern root
                 extern insert 
-
+                extern check 
+                extern print_avl 
+                extern format_string
+                extern key 
+                extern printf 
+                extern update
 stress_test:
     push rbp 
     mov rbp , rsp 
@@ -53,14 +58,29 @@ stress_test:
                         mov al , [rbp + u]
                         mov [rdi + 4] , al
                         mov byte [rdi + 5] , 0
-
+                     
                         mov rdi , [rbp + adr]
                         mov rsi , 0
                         call new_node
-
+                        
                         mov rdi , [root]
                         mov rsi , rax
                         call insert
+                        
+                        mov rdi , [root]
+                        mov rsi , [rbp + adr]
+                        call check 
+
+                        cmp al , 1 
+                        jne for1.fi
+
+
+                        mov rdi , [root]
+                        mov rsi , [rbp + adr]
+                        mov rdx , 30
+
+                        call update 
+
 
                         inc byte [rbp + u]
                         jmp for5
@@ -81,6 +101,8 @@ stress_test:
         jmp for1
     for1.fi:
 
+    mov rdi , [root]
+   ; call print_avl 
 
     mov rsp , rbp 
     pop rbp 
@@ -88,4 +110,4 @@ stress_test:
 
 
                 section .bss
-            strings: resb 6 * 26 * 26 * 26 * 26 * 26
+            strings: resb 6
