@@ -29,7 +29,7 @@ To end the interaction insert `EOF` (ctrl + d)
 
 * C++ version runs in **14 seconds**, using a map.
 <details open>
-   ```C++
+   ```c++
         #include <bits/stdc++.h>
         #include <stdio.h>
 

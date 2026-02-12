@@ -187,18 +187,3 @@ strchr:
             format_invalid_update_syntax: db "Invalid syntax" , 10 , 0
             unknown_command: db "Unknown command!" , 0
             inside_func: db "inside" , 0
-    ; 1 0 -> 0
-    ; 1011 ->     10110
-    ; 1011        01010 -> -10
-
-                ; 101
-                ; 011
-
-                ; 101
-                ; 001
-
-                ; 111
-                ; 001
-
-                ; 111
-                ; 011
