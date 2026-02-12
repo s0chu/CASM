@@ -25,6 +25,14 @@ sh compile.sh
 The interaction protocol is: `command-response`
 To end the interaction insert `EOF` (ctrl + d)
 
+<details open>
+
+<summary> Demo </summary>
+
+![▶️ Demo](demo.gif)
+
+</details>
+
 ## C++ Comparison
 
 * C++ version runs in **14 seconds**, using a map.
@@ -81,6 +89,7 @@ It doesn't follow a standard implementation, but the same logic applies.
 * The memory is allocated dynamically using `malloc` (from C) and deleted it with `free` (from C).
 * String handling is done via strings that terminates in a null character.
 * String manipulation functions are implemented with this logic in mind and are implemented in a bruteforce way like in C.
+* Debugging using `GDB` 
 
 ## Code Tricks
 
