@@ -13,6 +13,7 @@
                 extern format_key
 
                 extern malloc
+                extern free 
 
                 global left 
                 global right
@@ -28,6 +29,7 @@
                 global check 
                 global update 
                 global get 
+                global delete 
 
 create_new_node:
     push rbp 
@@ -284,135 +286,7 @@ insert: ; ptr , ptr -> ptr
         mov [rbx] , rax
 
         mov rdi , [rbp + node]
-        call recalculate
-
-        mov rax , [rbp + node]
-        mov rdi , [rax + left]
-        call get_height
-
-        mov rcx , [rbp + node]
-        add rcx , left 
-
-        if_4: cmp qword [rcx] , 0
-              jz if_4.fi
-
-            add rax , 1
-        if_4.fi:
-
-        push rax
-
-        mov rax , [rbp + node]
-        mov rdi , [rax + right]
-        call get_height
-        
-        mov rcx , [rbp + node]
-        add rcx , right 
-
-        if_5: cmp qword [rcx] , 0
-              jz if_5.fi 
-        
-            add rax , 1
-        if_5.fi:
-
-        push rax
-
-        mov rbx , [rbp + hl]
-        sub rbx , [rbp + hr]
-        
-        mov rax , [rbp + node]
-
-        if_2: cmp rbx , -2 
-              jne if_3
-
-            mov rcx , [rbp + node]
-            add rcx , right
-            push qword [rcx]
-            mov rcx , [rcx]
-
-            push qword [rcx + left]
-            push qword [rcx + right]
-
-            mov rdi , [rbp + node_r_l]
-            call get_height_2
-            push rax 
-
-            mov rdi , [rbp + node_r_r]
-            call get_height_2
-            push rax
-
-            mov rcx , [rbp + hrl]
-            sub rcx , [rbp + hrr]
-
-
-            if_6:   cmp rcx , 1
-                    jne if_6.fi
-                
-               
-
-                mov rdi , [rbp + node_r]
-                call right_rotate
-
-                mov rcx , [rbp + node]
-                mov [rcx + right] , rax
-
-                mov rcx , [rbp + node]
-                call recalculate
-
-            if_6.fi:
-
-            mov rdi , [rbp + node]
-            call left_rotate
-
-            jmp done_23
-        if_3: cmp rbx , 2
-              jne done_23
-            
-            sub rsp , 0xFF0
-        
-
-            mov rcx , [rbp + node]
-            add rcx , left
-            mov rcx , [rcx]
-            mov [rbp + node_l] , rcx
-
-            mov rdx , [rcx + left]
-            mov [rbp + node_l_l] , rdx
-
-            mov rdx , [rcx + right]
-            mov [rbp + node_l_r] ,rdx
-
-            mov rdi , [rbp + node_l_l]
-            call get_height_2
-            mov [rbp + hll] , rax 
-
-            mov rdi , [rbp + node_l_r]
-            call get_height_2
-            mov [rbp + hlr] , rax
-
-            mov rcx , [rbp + hll]
-            sub rcx , [rbp + hlr]
-
-            if_7:   cmp rcx , -1
-                    jne if_7.fi
-
-                    mov rdi , [rbp + node_l]
-                    call left_rotate
-
-                    mov rdx , [rbp + node]
-                    mov [rdx + left] , rax
-
-                    mov rdi , [rbp + node]
-                    call recalculate
-            if_7.fi: 
-
-            mov rdi , [rbp + node]
-            call right_rotate
-
-            ; mov rdx , rax 
-            ; mov rdi , rax 
-            ; call print_node
-        done_23:
-
+        call recalibrate
         
         mov rdx , [rbp + node]
         if_31:  cmp [root] , rdx 
@@ -684,8 +558,392 @@ get: ; key -> long long
     pop rbp 
     ret 
 
+delete: ; ptr key -> ptr 
+    push rbp 
+    mov rbp , rsp 
+    sub rsp , 512
 
-                section .data
+    %define node -8
+    %define x -16
+    %define chld -24
+    %define hl -32
+    %define hr -40
+    %define node_r -48
+    %define node_r_l -56
+    %define node_r_r -64
+    %define hrl -72
+    %define hrr -80
+    %define node_l -88
+    %define node_l_l -96
+    %define node_l_r -104
+    %define hll -112
+    %define hlr -120
+    %define son -128
+    %define nxt -136
+
+    mov [rbp + node] , rdi ;push rdi 
+    mov [rbp + x] , rsi ;push rsi 
+
+
+    if_43:  mov rdi , [rbp + node]
+            add rdi , key 
+            mov rsi , [rbp + x]
+            call strcmp
+            cmp rax , 0
+            jnz if_43.else 
+
+        ;delete magic 
+
+        if_50:  mov rbx , [rbp + node]
+                add rbx , left 
+                mov rbx , [rbx]
+                cmp rbx , 0 
+                jne if_50.else 
+
+                mov rbx , [rbp + node]
+                add rbx , right
+                mov rbx , [rbx]
+                cmp rbx , 0
+                jne if_50.else
+
+            mov rdi , [rbp + node]
+            xor rax , rax
+            call free 
+
+            mov rbx , [rbp + node]
+            cmp rbx , [root]
+
+            jne .noteq
+                mov qword [root] , 0
+            .noteq:
+
+            mov rax , 0 
+            jmp if_50.fi
+        if_50.else: 
+            if_51:  mov rbx , [rbp + node]
+                    add rbx , left 
+                    mov rbx , [rbx]
+                    cmp rbx , 0
+                    je if_51.else 
+
+                    mov rbx , [rbp + node]
+                    add rbx , right
+                    mov rbx , [rbx]
+                    cmp rbx , 0 
+                    je if_51.else  
+                
+                mov rbx , [rbp + node]
+                add rbx , right 
+                mov rbx , [rbx]
+
+                mov rdi , rbx 
+                call find_next 
+
+                mov [rbp + nxt] , rax 
+
+                mov rdi , [rbp + node]
+                add rdi , key 
+
+                mov rsi , [rbp + nxt]
+                add rsi , key 
+
+                call strcpy
+
+                mov rbx , [rbp + nxt]
+                add rbx , value 
+                mov rbx , [rbx]
+
+                mov rcx , [rbp + node]
+                mov [rcx + value] , rbx
+
+
+                mov rsi , [rbp + nxt]
+                add rsi , key 
+
+                mov rdi , [rbp + node]
+                add rdi , right
+                mov rdi , [rdi]
+
+                call delete 
+
+                mov rbx , [rbp + node]
+                add rbx , right
+                mov [rbx] , rax 
+
+                mov rdi , [rbp + node]
+                call recalibrate 
+
+                mov rbx , [rbp + node]
+                cmp rbx , [root]
+                jne .not_root 
+                    mov [root] , rax
+                .not_root:
+
+                ; special case            
+                jmp if_51.fi
+            if_51.else:
+                mov rbx , [rbp + node]
+                add rbx , left 
+                mov rbx , [rbx]
+
+                mov rcx , [rbp + node]
+                add rcx , right
+                mov rcx , [rcx]
+
+                add rbx , rcx
+        
+                mov [rbp + son] , rbx 
+
+                mov rdi , [rbp + node]
+                xor rax , rax 
+                call free 
+
+                mov rbx , [rbp + node]
+                cmp rbx , [root]
+                jne .not_root_delete
+                    mov rdx , [rbp + son]
+                    mov [root] , rdx
+                .not_root_delete:
+
+                mov rax , [rbp + son]
+            if_51.fi:
+        if_50.fi:
+
+        jmp if_43.fi
+    if_43.else:
+        if_39: cmp rax , 1
+               jne if_39.else 
+            
+            mov rdi , [rbp + node]
+            add rdi , left
+            mov rax , rdi
+
+            jmp if_39.fi
+        if_39.else:
+
+            mov rdi , [rbp + node]
+            add rdi , right 
+            mov rax , rdi
+
+        if_39.fi:
+
+        mov [rbp + chld] , rax ;push rax
+
+        mov rdi , [rax]
+        mov rsi , [rbp + x]
+        call delete
+
+        mov rbx , [rbp + chld]
+        mov [rbx] , rax
+
+        mov rdi , [rbp + node]
+        call recalibrate
+        
+        mov rdx , [rbp + node]
+        if_49:  cmp [root] , rdx 
+                jne if_49.fi
+
+            mov [root] , rax
+        if_49.fi:
+
+    if_43.fi:
+
+    mov rsp , rbp 
+    pop rbp 
+    ret
+
+recalibrate: ; ptr -> ptr
+    push rbp 
+    mov rbp , rsp 
+
+    sub rsp , 512 
+
+    mov [rbp + node] , rdi 
+
+    %define node -8
+    %define x -16
+    %define chld -24
+    %define hl -32
+    %define hr -40
+    %define node_r -48
+    %define node_r_l -56
+    %define node_r_r -64
+    %define hrl -72
+    %define hrr -80
+    %define node_l -88
+    %define node_l_l -96
+    %define node_l_r -104
+    %define hll -112
+    %define hlr -120
+    %define son -128
+
+    mov rdi , [rbp + node]
+    call recalculate
+
+    mov rax , [rbp + node]
+    mov rdi , [rax + left]
+    call get_height
+
+    mov rcx , [rbp + node]
+    add rcx , left 
+
+    if_40: cmp qword [rcx] , 0
+            jz if_40.fi
+
+        add rax , 1
+    if_40.fi:
+
+    mov [rbp + hl] , rax; push rax
+
+    mov rax , [rbp + node]
+    mov rdi , [rax + right]
+    call get_height
+    
+    mov rcx , [rbp + node]
+    add rcx , right 
+
+    if_41: cmp qword [rcx] , 0
+            jz if_41.fi 
+    
+        add rax , 1
+    if_41.fi:
+
+    mov [rbp + hr] , rax ;push rax
+
+    mov rbx , [rbp + hl]
+    sub rbx , [rbp + hr]
+    
+    mov rax , [rbp + node]
+
+    if_42: cmp rbx , -2 
+            jne if_47
+
+        mov rcx , [rbp + node]
+        add rcx , right
+
+        mov rdx , [rcx]
+        mov [rbp + node_r] , rdx ;push qword [rcx]
+        mov rcx , [rcx]
+
+        mov rdx , [rcx + left]
+        mov [rbp + node_r_l] , rdx ;push qword [rcx + left]
+        mov rdx , [rcx + right]
+        mov [rbp + node_r_r] , rdx ;push qword [rcx + right]
+
+        mov rdi , [rbp + node_r_l]
+        call get_height_2
+        mov [rbp + hrl] , rax;push rax 
+
+        mov rdi , [rbp + node_r_r]
+        call get_height_2
+        mov [rbp + hrr] , rax;push rax
+
+        mov rcx , [rbp + hrl]
+        sub rcx , [rbp + hrr]
+
+
+        if_46:   cmp rcx , 1
+                jne if_46.fi
+            
+            
+
+            mov rdi , [rbp + node_r]
+            call right_rotate
+
+            mov rcx , [rbp + node]
+            mov [rcx + right] , rax
+
+            mov rcx , [rbp + node]
+            call recalculate
+
+        if_46.fi:
+
+        mov rdi , [rbp + node]
+        call left_rotate
+
+        jmp done_232
+    if_47: cmp rbx , 2
+            jne done_232
+        
+
+        mov rcx , [rbp + node]
+        add rcx , left
+        mov rcx , [rcx]
+        mov [rbp + node_l] , rcx
+
+        mov rdx , [rcx + left]
+        mov [rbp + node_l_l] , rdx
+
+        mov rdx , [rcx + right]
+        mov [rbp + node_l_r] ,rdx
+
+        mov rdi , [rbp + node_l_l]
+        call get_height_2
+        mov [rbp + hll] , rax 
+
+        mov rdi , [rbp + node_l_r]
+        call get_height_2
+        mov [rbp + hlr] , rax
+
+        mov rcx , [rbp + hll]
+        sub rcx , [rbp + hlr]
+
+        if_48:   cmp rcx , -1
+                jne if_48.fi
+
+                mov rdi , [rbp + node_l]
+                call left_rotate
+
+                mov rdx , [rbp + node]
+                mov [rdx + left] , rax
+
+                mov rdi , [rbp + node]
+                call recalculate
+        if_48.fi: 
+
+        mov rdi , [rbp + node]
+        call right_rotate
+
+        ; mov rdx , rax 
+        ; mov rdi , rax 
+        ; call print_node
+    done_232:
+
+    mov rsp , rbp 
+    pop rbp
+    ret
+
+
+
+find_next: ; ptr -> ptr 
+    push rbp 
+    mov rbp , rsp 
+
+    %define node -8 
+
+
+    mov [rbp + node] , rdi 
+    
+    mov rbx , [rbp + node]
+    add rbx , left 
+    mov rbx , [rbx]
+
+    if_52:  cmp rbx , 0
+            jne if_52.else
+
+        mov rax , [rbp + node]
+        jmp if_52.fi
+    if_52.else:
+        mov rdi , rbx 
+        call find_next 
+    if_52.fi:
+
+    mov rsp , rbp 
+    pop rbp 
+    ret 
+
+global_data:
+                 section .data
             ARB_PTR: dq 0 
             _SIZE: equ 48 
             txt: db "hello" ,  10 , 0

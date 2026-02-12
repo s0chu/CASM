@@ -21,6 +21,7 @@
                 
                 extern strcmp 
                 extern strstr 
+                extern strlen 
 
                 section .text
 
@@ -28,8 +29,39 @@
 new_handler: 
     push rbp 
     mov rbp , rsp
+    sub rsp , 512 
 
+    %define n -4 
+    %define s -12 
+    %define comm_size -16
 
+    mov [rbp + s] , rdi 
+    call strlen 
+    mov [rbp + n] , eax 
+
+    mov rbx , [rbp + s]
+    mov byte [rbx + rax - 1] , 0
+    add rbx , 4
+
+    mov rdi , rbx
+    call strlen 
+    mov [rbp + comm_size] , eax 
+
+    if_53:  cmp dword [rbp + comm_size] , 0  
+            jne if_53.else 
+
+        mov rdi , format_empty_command
+        xor rax , rax
+        call printf 
+
+        jmp if_53.fi
+    if_53.else:
+        if_54:  cmp dword[rbp + comm_size] , 19
+                jle if_54.else
+        if_54.else:
+
+        if_54.fi:
+    if_53.fi:
 
     mov rsp , rbp 
     pop rbp 

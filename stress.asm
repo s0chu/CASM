@@ -9,6 +9,7 @@
                 extern key 
                 extern printf 
                 extern update
+                extern delete
 stress_test:
     push rbp 
     mov rbp , rsp 
@@ -81,7 +82,6 @@ stress_test:
 
                         call update 
 
-
                         inc byte [rbp + u]
                         jmp for5
                     for5.fi:
@@ -101,8 +101,71 @@ stress_test:
         jmp for1
     for1.fi:
 
+      mov byte [rbp + i] , 97
+    for6:   cmp byte [rbp + i] , 122
+            ja for6.fi 
+
+        mov byte [rbp + j] , 97
+        for7:   cmp byte [rbp + j] , 122 
+                ja for7.fi 
+            
+            mov byte [rbp + t] , 97
+            for8:   cmp byte [rbp + t] , 122 
+                    ja for8.fi 
+
+                mov byte [rbp + r] , 97
+                for9:   cmp byte [rbp + r] , 122
+                        ja for9.fi 
+
+                    mov byte [rbp + u] , 97
+                    for10:   cmp byte [rbp + u] , 122 
+                            ja for10.fi
+                                   
+                        mov al , [rbp + i]
+                        mov bl , [rbp + j]
+                        mov cl , [rbp + t]
+                        mov dl , [rbp + r]
+                        
+                        mov rdi , [rbp + adr]
+
+                        mov [rdi + 0] , al 
+                        mov [rdi + 1] , bl 
+                        mov [rdi + 2] , cl 
+                        mov [rdi + 3] , dl
+                        mov al , [rbp + u]
+                        mov [rdi + 4] , al
+                        mov byte [rdi + 5] , 0
+                     
+                        mov rdi , [root]
+                        mov rsi , [rbp + adr]
+                        call delete 
+
+                        inc byte [rbp + u]
+                        jmp for10
+                    for10.fi:
+
+                    inc byte [rbp + r]
+                    jmp for9
+                for9.fi:
+
+                inc byte [rbp + t]
+                jmp for8
+            for8.fi:
+
+            inc byte [rbp + j] 
+            jmp for7
+        for7.fi:
+        inc byte [rbp + i]
+        jmp for6
+    for6.fi:
+
+    ; mov rdi , [root]
+    ; mov rsi , to_delete
+    ; call delete 
+
+
     mov rdi , [root]
-   ; call print_avl 
+    call print_avl 
 
     mov rsp , rbp 
     pop rbp 
@@ -111,3 +174,6 @@ stress_test:
 
                 section .bss
             strings: resb 6
+
+                section .data 
+            to_delete: db "zzzzx" , 0

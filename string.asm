@@ -175,7 +175,7 @@ strchr:
             format_node:    db "left:%10p right:%10p height:%5d key: %6s value: %5d curr: %10p" , 10 , 0
             format_key:     db "%s" , 10 , 0
             format_pointer: db "%p" , 10 , 0
-
+            format_empty_command: db "Empty commands are not allowed" , 10 , 0
             unknown_command: db "Unknown command!" , 0
             inside_func: db "inside" , 0
     ; 1 0 -> 0
