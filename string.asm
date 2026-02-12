@@ -7,7 +7,12 @@
                     global format_pointer 
                     global format_key 
                     global format_string_scanf 
-                    
+                    global format_empty_command
+                    global format_max_size_allowed
+                    global format_key_nonexistent
+                    global format_long 
+                    global format_invalid_update_syntax
+
                     global unknown_command
                     global inside_func 
 
@@ -171,11 +176,15 @@ strchr:
 
             format_string_scanf: db "%s" , 0
             format_decimal: db "%d" , 10 , 0
+            format_long: db "%lld" , 10 , 0
             format_string:  db "%s" , 10 , 0
-            format_node:    db "left:%10p right:%10p height:%5d key: %6s value: %5d curr: %10p" , 10 , 0
+            format_node:    db "left:%10p right:%10p height:%5d key: %6s value: %5d addr: %10p" , 10 , 0
             format_key:     db "%s" , 10 , 0
             format_pointer: db "%p" , 10 , 0
             format_empty_command: db "Empty commands are not allowed" , 10 , 0
+            format_max_size_allowed: db "Variable name must have maximum 19 characters" , 10 , 0
+            format_key_nonexistent: db "Key doesn't exist" , 10 , 0
+            format_invalid_update_syntax: db "Invalid syntax" , 10 , 0
             unknown_command: db "Unknown command!" , 0
             inside_func: db "inside" , 0
     ; 1 0 -> 0
