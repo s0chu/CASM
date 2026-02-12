@@ -28,6 +28,41 @@ To end the interaction insert `EOF` (ctrl + d)
 ## C++ Comparison
 
 * C++ version runs in **14 seconds**, using a map.
+<details open>
+   ```C++
+        #include <bits/stdc++.h>
+        #include <stdio.h>
+
+        using namespace std;
+
+        map < string , long long > avl;
+
+        int main()
+        {
+            string s; 
+
+            for(int i = 'a' ; i <= 'z' ; i++)
+                for(int j = 'a' ; j <= 'z' ; j++)
+                    for(int t = 'a' ; t <= 'z' ; t++)
+                        for(int r = 'a' ; r <= 'z' ; r++)
+                            for(int u = 'a' ; u <= 'z' ; u++)
+                            {
+                                s = "";
+                                s += i;
+                                s += j;
+                                s += t;
+                                s += r; 
+                                s += u; 
+                                
+                                avl[s] = 0;
+                            }
+
+            
+            return 0;
+        }
+    ```
+    
+</details>
 * My version runs in **8 seconds**.
 
 ## Implementation Details
